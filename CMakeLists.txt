@@ -1,27 +1,84 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(myconanprj CXX)
+project(myproject CXX)
 
-# Set a default build type if none was specified
+set(MYPROJECT_DEFAULT_BUILD_TYPE "Release" CACHE STRING "default build type used when CMAKE_BUILD_TYPE is not specified")
+
+###
+### Set a default build type if none was specified
+###
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    set(default_build_type "Release")
-    message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
-    set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "Choose the type of build." FORCE)
+    message(STATUS "Setting build type to '${MYPROJECT_DEFAULT_BUILD_TYPE}' as none was specified.")
+    set(CMAKE_BUILD_TYPE "${MYPROJECT_DEFAULT_BUILD_TYPE}" CACHE STRING "Default build type" FORCE)
     # Set the possible values of build type for cmake-gui
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# 1. Ensure conan-cmake submodule is available
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/external/cmake-conan/conan.cmake")
-    message(STATUS "Retrieving cmake-conan from git submodule...")
-    find_package(Git REQUIRED)
-    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init -- external/cmake-conan
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-endif()
-
-# 2. Setup conan
-include(${CMAKE_SOURCE_DIR}/external/cmake-conan/conan.cmake)
-
-# 3. Perform 'conan install' using existing conanfile.txt
-conan_cmake_run(CONANFILE conanfile.txt
+###
+### Setup conan
+###
+if(CONAN_EXPORTED) # in conan local cache, 'developer' mode
+    # standard conan installation, deps will be defined in conanfile.py
+    # and not necessary to call conan again, conan is already running
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup(TARGETS)
+else() # in user space, 'user' mode
+    # 1. Ensure conan.cmake helper is available
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+        message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+        file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/v0.11/conan.cmake"
+                      "${CMAKE_BINARY_DIR}/conan.cmake")
+    endif()
+    # 2. Setup conan
+    include(${CMAKE_BINARY_DIR}/conan.cmake)
+    # 3. Perform 'conan install'
+    # Make sure to use conanfile.py to define dependencies, to stay consistent
+    conan_cmake_run(CONANFILE conanfile.py
                 BASIC_SETUP CMAKE_TARGETS
                 BUILD missing)
+endif()
+
+###
+### Setup common compile features
+### Creates target 'myproject::cxxfeatures'
+###
+add_library(cxxfeatures INTERFACE)
+if(${CMAKE_VERSION} VERSION_LESS "3.8.0" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    if(MSVC)
+        set(_cxx_flags  /std:c++17)
+    else()
+        set(_cxx_flags -std=c++17)
+    endif()
+    set_property(TARGET cxxfeatures PROPERTY INTERFACE_COMPILE_OPTIONS ${_cxx_flags})
+    message(STATUS "Compile features not available for the current toolchain or CMake version, setting C++ standard level directly via compiler flags")
+else()
+    set_property(TARGET cxxfeatures PROPERTY INTERFACE_COMPILE_FEATURES cxx_std_17)
+endif()
+# Add target alias for the sake of consistency
+add_library(myproject::cxxfeatures ALIAS cxxfeatures)
+
+###
+### Setup common warnings level
+### Creates target 'myproject::warnings'
+###
+add_library(warnings INTERFACE)
+if(MSVC)
+    set(_warn_flags /W4 /WX)
+else()
+    set(_warn_flags -Wall -pedantic -Werror)
+endif()
+set_property(TARGET warnings PROPERTY INTERFACE_COMPILE_OPTIONS ${_warn_flags})
+# Add target alias for the sake of consistency
+add_library(myproject::warnings ALIAS warnings)
+
+###
+### Add project targets
+###
+add_executable(cli src/main.cpp)
+set_target_properties(cli PROPERTIES OUTPUT_NAME "myproject-cli")
+target_link_libraries(cli
+                      myproject::warnings
+                      myproject::cxxfeatures
+                      CONAN_PKG::clara)
+install(TARGETS cli DESTINATION bin)
+# Add target alias for the sake of consistency
+add_executable(myproject::cli ALIAS cli)
