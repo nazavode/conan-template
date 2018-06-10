@@ -1,0 +1,5 @@
+---
+Checks: '-*,modernize-*,bugprone-*,misc-suspicious-string-compare,misc-unused-using-decls,misc-incorrect-roundings'
+HeaderFilterRegex: 'src/[^/]*\.(h|hpp|cpp)$'
+FormatStyle: file
+...
