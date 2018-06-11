@@ -92,9 +92,11 @@ endif()
 add_executable(cli src/main.cpp)
 set_target_properties(cli PROPERTIES OUTPUT_NAME "myproject-cli")
 target_link_libraries(cli
-                      myproject::warnings
-                      myproject::cxxfeatures
-                      CONAN_PKG::clara)
+    PUBLIC
+        CONAN_PKG::clara
+    PRIVATE
+        myproject::warnings
+        myproject::cxxfeatures)
 install(TARGETS cli DESTINATION bin)
 # Add target alias for the sake of consistency
 add_executable(myproject::cli ALIAS cli)
