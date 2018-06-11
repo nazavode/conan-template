@@ -43,7 +43,7 @@ endif()
 ### Creates target 'myproject::cxxfeatures'
 ###
 add_library(cxxfeatures INTERFACE)
-if(${CMAKE_VERSION} VERSION_LESS "3.8.0" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+if(NOT cxx_std_17 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
     if(MSVC)
         set(_cxx_flags  /std:c++17)
     else()
