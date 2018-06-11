@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(myproject CXX)
 
+option(MYPROJECT_ENABLE_STATIC_EXE "All executables targets are linked as static. This doesn't affect dependencies linkage" ON)
 set(MYPROJECT_DEFAULT_BUILD_TYPE "Release" CACHE STRING "default build type used when CMAKE_BUILD_TYPE is not specified")
 
 ###
@@ -69,6 +70,21 @@ endif()
 set_property(TARGET warnings PROPERTY INTERFACE_COMPILE_OPTIONS ${_warn_flags})
 # Add target alias for the sake of consistency
 add_library(myproject::warnings ALIAS warnings)
+
+### Setup executables linkage
+### Please note that this section sets CMAKE_EXE_LINKER_FLAGS
+### globally!
+### We can't actually create interface targets for
+### linker flags until this has been released:
+### https://gitlab.kitware.com/cmake/cmake/issues/16543
+###
+if(MYPROJECT_ENABLE_STATIC_EXE)
+    if(MSVC)
+        message(WARNING "TODO: MSVC static executables not yet supported")
+    else()
+        set(CMAKE_EXE_LINKER_FLAGS "-static")
+    endif()
+endif()
 
 ###
 ### Add project targets
