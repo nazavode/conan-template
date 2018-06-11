@@ -24,8 +24,7 @@ Please note that building via `cmake` is considered *user* mode while this
 [official approach](https://github.com/conan-io/cmake-conan#creating-packages):
 ```console
 $ cd conan-template
-$ mkdir build
-$ cd build
+$ mkdir build && cd build
 $ conan install ..  # you can customize options and settings here
 $ conan build ..
 ```
