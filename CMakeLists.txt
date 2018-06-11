@@ -52,7 +52,9 @@ else()
         set(_cxx_flags -std=c++17)
     endif()
     set_property(TARGET cxxfeatures PROPERTY INTERFACE_COMPILE_OPTIONS ${_cxx_flags})
-    message(WARNING "Compile features not available for the current toolchain or CMake version, setting C++ standard level directly via compiler flags")
+    message(WARNING "Compile features not available for the current toolchain or CMake version, \
+setting C++ standard level directly via compiler flags. Please be aware that setting flags doesn't \
+check actual support by the underlying toolchain, e.g.: build may fail if the flags are unsupported.")
 endif()
 # Add target alias for the sake of consistency
 add_library(myproject::cxxfeatures ALIAS cxxfeatures)
