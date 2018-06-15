@@ -10,6 +10,7 @@ class MyprojectConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = "shared=False"
+    exports_sources = "src/*"
 
     # warning: this must be a tuple
     # (a list won't work for some obscure reason)
