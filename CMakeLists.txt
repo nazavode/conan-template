@@ -84,8 +84,9 @@ set_property(TARGET warnings PROPERTY INTERFACE_COMPILE_OPTIONS ${_warn_flags})
 # Add target alias for the sake of consistency
 add_library(myproject::warnings ALIAS warnings)
 
+###
 ### Setup executables linkage
-### Please note that this section sets CMAKE_EXE_LINKER_FLAGS
+### Please note that this section modifies CMAKE_EXE_LINKER_FLAGS
 ### globally!
 ### We can't actually create interface targets for
 ### linker flags until this has been released:
@@ -93,11 +94,13 @@ add_library(myproject::warnings ALIAS warnings)
 ###
 if(MYPROJECT_ENABLE_STATIC_EXE)
     if(MSVC)
-        message(WARNING "TODO: MSVC static executables not yet supported.")
+        message(WARNING "TODO: MSVC static executables not yet supported, \
+keeping default link flags.")
     elseif(APPLE)
-        message(WARNING "Static executables on macOSX are not supported, falling back to dynamic executables.")
+        message(WARNING "Static executables on macOSX are not supported, \
+keeping default link flags.")
     else()
-        set(CMAKE_EXE_LINKER_FLAGS "-static")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif()
 endif()
 
