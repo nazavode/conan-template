@@ -23,15 +23,9 @@ if(CONAN_EXPORTED) # in conan local cache, 'developer' mode
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS)
 else() # in user space, 'user' mode
-    # 1. Ensure conan.cmake helper is available
-    if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-        message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-        file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/v0.11/conan.cmake"
-                      "${CMAKE_BINARY_DIR}/conan.cmake")
-    endif()
-    # 2. Setup conan
-    include(${CMAKE_BINARY_DIR}/conan.cmake)
-    # 3. Perform 'conan install'
+    # 1. Setup conan
+    include(cmake/conan.cmake)
+    # 2. Perform 'conan install'
     # Make sure to use conanfile.py to define dependencies, to stay consistent
     conan_cmake_run(CONANFILE conanfile.py
                 BASIC_SETUP CMAKE_TARGETS
