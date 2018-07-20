@@ -16,24 +16,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON
     CACHE BOOL "Generate compile commands database for clang tooling"
     FORCE)
 
-# --- Build Type ---
-# Make sure to set CMAKE_BUILD_TYPE when none has been specified by the user.
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(
-    STATUS
-      "Setting build type to '${MYPROJECT_DEFAULT_BUILD_TYPE}' as none was specified.")
-  set(CMAKE_BUILD_TYPE "${MYPROJECT_DEFAULT_BUILD_TYPE}"
-      CACHE STRING "Default build type"
-      FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE
-               PROPERTY STRINGS
-                        "Debug"
-                        "Release"
-                        "MinSizeRel"
-                        "RelWithDebInfo")
-endif()
-
 # --- Inclusions ---
 # Stuff shipped with CMake
 include(CheckCXXCompilerFlag)
@@ -41,10 +23,15 @@ include(CheckCXXCompilerFlag)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/find)
 # Extra functions
 include(cmake/get-target-sources.cmake)
+include(cmake/ensure-build-type.cmake)
 
 # --- Find external stuff ---
 find_package(ClangFormat)
 find_package(ClangTidy)
+
+# --- Build Type ---
+# Make sure to set CMAKE_BUILD_TYPE when none has been specified by the user.
+ensure_build_type(${MYPROJECT_DEFAULT_BUILD_TYPE})
 
 # --- Conan ---
 # Setup dependencies and corresponding targets with Conan.
