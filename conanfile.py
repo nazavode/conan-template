@@ -2,21 +2,22 @@ from conans import ConanFile, CMake
 
 
 class MyprojectConan(ConanFile):
-    name = "myproject"
-    version = "0.0.1"
-    license = "<Put the package license here>"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of Myproject here>"
-    settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = "shared=False"
-    exports_sources = "src/*"
+    name = 'myproject'
+    version = '0.0.1'
+    license = '<Put the package license here>'
+    url = '<Package recipe repository url here, for issues about the package>'
+    description = '<Description of Myproject here>'
+    settings = 'os', 'compiler', 'build_type', 'arch'
+    options = {'shared': [True, False]}
+    default_options = 'shared=False'
+    exports_sources = 'src/*'
 
     # warning: this must be a tuple
     # (a list won't work for some obscure reason)
     generators = (
         'cmake',
         'compiler_args',
+        'txt',
     )
 
     # warning: this must be a tuple
