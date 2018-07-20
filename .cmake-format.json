@@ -1,0 +1,27 @@
+{
+  "line_width": 90,
+  "tab_size": 2,
+  "max_subargs_per_line": 3,
+  "separate_ctrl_name_with_space": false,
+  "separate_fn_name_with_space": false,
+  "dangle_parens": false,
+  "bullet_char": "*",
+  "enum_char": ".",
+  "line_ending": "unix",
+  "command_case": "lower",
+  "keyword_case": "unchanged",
+  "additional_commands": {
+    "foo": {
+      "flags": [
+        "BAR",
+        "BAZ"
+      ],
+      "kwargs": {
+        "HEADERS": "*",
+        "SOURCES": "*",
+        "DEPENDS": "*"
+      }
+    }
+  },
+  "always_wrap": []
+}
