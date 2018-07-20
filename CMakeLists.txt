@@ -35,6 +35,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # --- Inclusions ---
+# Stuff shipped with CMake
 include(CheckCXXCompilerFlag)
 # Extra finders
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/find)
@@ -108,7 +109,6 @@ add_library(myproject::warnings ALIAS warnings)
 # Please note that this section modifies CMAKE_EXE_LINKER_FLAGS globally! We can't
 # actually create interface targets for linker flags until this has been released:
 # https://gitlab.kitware.com/cmake/cmake/issues/16543
-#
 if(MYPROJECT_ENABLE_STATIC_EXE)
   if(MSVC)
     message(WARNING "TODO: MSVC static executables not yet supported, \
@@ -137,9 +137,6 @@ get_target_sources(all_sources myproject::cli)
 
 if(CLANG_FORMAT_FOUND)
   message("clang-format found: ${CLANG_FORMAT_EXECUTABLE}")
-  add_custom_target(format
-                    COMMAND ${CLANG_FORMAT_EXECUTABLE} -style=file ${all_sources}
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
   add_custom_target(format-fix
                     COMMAND ${CLANG_FORMAT_EXECUTABLE} -style=file -i ${all_sources}
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
@@ -149,12 +146,12 @@ endif()
 
 if(CLANG_TIDY_FOUND)
   message("clang-tidy found: ${CLANG_TIDY_EXECUTABLE}")
+  set(tidy_cmd ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} -warnings-as-errors=*)
   add_custom_target(tidy
-                    COMMAND ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} ${all_sources}
+                    COMMAND ${tidy_cmd} ${all_sources}
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
   add_custom_target(tidy-fix
-                    COMMAND ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} -fix
-                            ${all_sources}
+                    COMMAND ${tidy_cmd} -fix ${all_sources}
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 else()
   message("clang-tidy not found")
