@@ -4,5 +4,6 @@ ColumnLimit: 90
 IndentWidth: 4
 ---
 Language: Cpp
+Standard: Cpp11
 IncludeBlocks: Regroup
 ...
